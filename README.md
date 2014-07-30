@@ -60,6 +60,14 @@ $config['synhigh']['brush'] = array(
 	'Php',
 	'Xml'
 );
+// Don't load SyntaxHighlighter on certain pages based on __*single*__ meta tags,
+// i.e. meta tags that take only one value, like title, template, category...
+// Use the pipe | as separator, without space ; case-sensitive.
+$config['synhigh']['exclude'] = array(
+	'template' => 'category',
+	'title' => 'GCweb, qu\'est-ce que c\'est ?|CV',
+	'category' => 'Maîtrise Sciences du langage|Master recherche Sciences du langage|Master professionnel Édition'
+);
 ````
 
 ### Content
@@ -94,5 +102,5 @@ If you are loading the brushes the "normal way", you have to use the aliases def
 
 ## TODO
 
-- add template filtering ?
+- add template filtering ? ==> done, extended to exclusion by title, category, or other single meta tags
 - comment the code
