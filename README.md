@@ -91,3 +91,8 @@ hihihi
 ````
 
 If you are loading the brushes the "normal way", you have to use the aliases defined in each brush file. For the plain text brush, two aliases are defined : text and plain, but not txt.
+
+## TODO
+
+- add template filtering ?
+- comment the code
