@@ -32,7 +32,7 @@ class SyntaxHighlighter {
 	            {
 	            	$synhigh_autobrushscripts .= '\''.$key.'		'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shBrush'.$value.'.js\','.PHP_EOL;
 	            }
-	            $this->synhigh_autobrushscripts = substr($synhigh_autobrushscripts,0,-3);
+	            $this->synhigh_autobrushscripts = rtrim($synhigh_autobrushscripts, ",".PHP_EOL);
     		}
         }
     	elseif((isset($settings['synhigh']['autoloader']) && $settings['synhigh']['autoloader'] === false) || empty($settings['synhigh']['autoloader']))
