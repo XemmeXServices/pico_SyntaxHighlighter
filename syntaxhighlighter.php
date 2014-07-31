@@ -15,7 +15,9 @@ class SyntaxHighlighter {
 
 	public function config_loaded(&$settings)
 	{	
+		/*	Get the PicoCMS theme in use */
 		$this->theme_url = $settings['base_url'] .'/'. basename(THEMES_DIR) .'/'. $settings['theme'];
+		/*	Get the variables from the user's config.php */
 		if (isset($settings['synhigh']['theme']))
         {
             $this->synhigh_theme = $settings['synhigh']['theme'];
@@ -36,80 +38,108 @@ class SyntaxHighlighter {
         {
         	$this->synhigh_exclude = $settings['synhigh']['exclude'];
         }
+        /*	Adding basic variables for SyntaxHighlighter */
+        $this->synhigh_base = '
+			<link href="'.$this->theme_url.'/scripts/syntaxhighlighter/styles/shCore.css" rel="stylesheet" type="text/css" />
+			<link href="'.$this->theme_url.'/scripts/syntaxhighlighter/styles/shTheme'.$this->synhigh_theme.'.css" rel="stylesheet" type="text/css" />
+			<script src="'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shCore.js"></script>';
+		$this->synhigh_autoloaderscript = '<script src="'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shAutoloader.js"></script>';
     }
 
+    /* 	Getting and inverting (for an easier comparison later)
+    	the array of the current page meta 	*/
     public function file_meta(&$meta)
-    {	
-    	$exclude = "";
-    	if (isset($this->synhigh_exclude))
-    	{
-    		foreach ($this->synhigh_exclude as $metaname => $metavalue)
-    		{
-	        	$metavalue = explode('|', $metavalue);
-	        	foreach ($metavalue as $key => $value) {
-	        		if (isset($meta[$metaname]) && $meta[$metaname] == $value)
-	        		{
-	        			$exclude = true;
-	        		}
-	        	}
-    		}
+    {
+    	$this->rmeta = array_flip($meta);
+   	}
+
+   	/*	Is the current page exluded based on user's configuration ?
+   		return true if excluded, false if not excluded	*/
+   	public function synhigh_test_exclude()
+   	{
+    	$metaexclude = array();
+    	foreach ($this->synhigh_exclude as $metakey => $metavalue) {
+    		/*	Split each line of the array
+    			using the pipe | as separator	*/
+    		$metavalue = explode('|', $metavalue);
+    		/*	Creating an array with values as index
+    			and meta names as values
+    			(just like the array of the current page meta) */
+    		foreach ($metavalue as $key => $value) {
+    			$metaexclude[$value] = $metakey;
+        	}
     	}
-    	
-    	$this->exclude = $exclude;
-    
-    	if (empty($this->exclude))
+    	/*	Comparing the two arrays, keeping only matching pairs of key and value */
+    	$this->diff = array_filter(array_intersect_assoc($metaexclude, $this->rmeta));
+    	if (empty($this->diff)) {
+    		return false;
+    	}
+    	else
     	{
-	        if (isset($this->synhigh_autoloader) && $this->synhigh_autoloader === true)
+    		return true;
+    	}
+    }
+
+    public function build_scripts()
+    {
+    	/*	Building the scripts we have to add to each pages that are not excluded	*/
+    	/*	If the autoloader feature is active	*/
+        if (isset($this->synhigh_autoloader) && $this->synhigh_autoloader === true)
+        {
+    		if (isset($this->synhigh_autobrush) && is_array($this->synhigh_autobrush))
+    		{
+    			/*	Creating a string with all the brushes scripts that have to be loaded	*/
+    			$synhigh_autobrushscripts = '';
+    			foreach ($this->synhigh_autobrush as $key => $value)
+	            {
+	            	$synhigh_autobrushscripts .= '\''.$key.'		'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shBrush'.$value.'.js\','.PHP_EOL;
+	            }
+	            /*	Removing extra comma and space at the end of the last brush */
+	            $this->synhigh_autobrushscripts = rtrim($synhigh_autobrushscripts, ",".PHP_EOL);
+	            /*	Concatenating the brush inside a larger script
+	            	that will be placed a the end of the page body 	*/
+	            $this->synhigh_body = '<script type="text/javascript">
+					SyntaxHighlighter.autoloader('.PHP_EOL.
+					$this->synhigh_autobrushscripts.PHP_EOL.');
+					SyntaxHighlighter.all();
+		    	</script>';
+		    	/*	Concatenating base and autoloader for the page head */
+		    	$this->synhigh_head = $this->synhigh_base.PHP_EOL.$this->synhigh_autoloaderscript;
+		    	/*	Returning body and head as an array
+		    		for an easy access in after_render function */
+		    	return array($this->synhigh_body, $this->synhigh_head);
+    		}
+        }
+        /*	If the autoloader feature is not active or not present in the config.php 	*/
+    	elseif((isset($this->synhigh_autoloader) && $this->synhigh_autoloader === false) || empty($this->synhigh_autoloader))
+        {
+        	if (isset($this->synhigh_brush) && is_array($this->synhigh_brush))
 	        {
-	    		$this->synhigh_loader = '<script src="'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shAutoloader.js"></script>';
-	    		if (isset($this->synhigh_autobrush) && is_array($this->synhigh_autobrush))
-	    		{
-	    			$synhigh_autobrushscripts = '';
-	    			foreach ($this->synhigh_autobrush as $key => $value)
-		            {
-		            	$synhigh_autobrushscripts .= '\''.$key.'		'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shBrush'.$value.'.js\','.PHP_EOL;
-		            }
-		            $this->synhigh_autobrushscripts = rtrim($synhigh_autobrushscripts, ",".PHP_EOL);
-	    		}
-	        }
-	    	elseif((isset($this->synhigh_autoloader) && $this->synhigh_autoloader === false) || empty($this->synhigh_autoloader))
-	        {
-	        	if (isset($this->synhigh_brush) && is_array($this->synhigh_brush))
-		        {
-		        	$synhigh_brushscripts = '';
-		            foreach ($this->synhigh_brush as $key => $value)
-		            {
-		            	$synhigh_brushscripts .= '<script src="'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shBrush'.$value.'.js"></script>'.PHP_EOL;
-		            }
-		            $this->synhigh_loader = $synhigh_brushscripts.PHP_EOL.'<script>SyntaxHighlighter.all()</script>';
-		        }
+	        	/*	Creating a string with all the brushes scripts that have to be loaded	*/
+	        	$synhigh_brushscripts = '';
+	            foreach ($this->synhigh_brush as $key => $value)
+	            {
+	            	$synhigh_brushscripts .= '<script src="'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shBrush'.$value.'.js"></script>'.PHP_EOL;
+	            }
+	            /*	A single string for the page body 	*/
+	            $this->synhigh_body = '<script>SyntaxHighlighter.all()</script>';
+	            /*	Concatenating base and brushes scripts for the page head 	*/
+	            $this->synhigh_head = $this->synhigh_base.PHP_EOL.$synhigh_brushscripts;
+	            /*	Returning body and head as an array
+		    		for an easy access in after_render function */
+	            return array($this->synhigh_body, $this->synhigh_head);
 	        }
         }
     }
 
-	public function after_render(&$output)
-	{	
-		if (isset($this->exclude) && $this->exclude != 1)
-    	{
-			if (isset($this->synhigh_autobrushscripts) && $this->synhigh_autobrushscripts != '') {
-				$synhigh_body = '<script type="text/javascript">
-						SyntaxHighlighter.autoloader('.PHP_EOL.
-						$this->synhigh_autobrushscripts
-						.PHP_EOL.');
-						SyntaxHighlighter.all();
-			    	</script>';
-			    
-		    	$output = str_replace('</body>', PHP_EOL.$synhigh_body.'</body>', $output);
-			}
-
-			$synhigh_head = '
-		<link href="'.$this->theme_url.'/scripts/syntaxhighlighter/styles/shCore.css" rel="stylesheet" type="text/css" />
-		<link href="'.$this->theme_url.'/scripts/syntaxhighlighter/styles/shTheme'.$this->synhigh_theme.'.css" rel="stylesheet" type="text/css" />
-		<script src="'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shCore.js"></script>'.PHP_EOL.'	'.$this->synhigh_loader;
-
-			$output = str_replace('</head>', PHP_EOL.$synhigh_head.'</head>', $output);
-		}
-	}
+    public function after_render(&$output)
+    {	
+    	/*	If the page is not excluded	*/
+    	if ($this->synhigh_test_exclude() == false) {
+    		/*	Modifying the page's end of body and head	*/
+    		$output = str_replace('</body>', PHP_EOL.$this->build_scripts()[0].PHP_EOL.'</body>', $output);
+    		$output = str_replace('</head>', PHP_EOL.$this->build_scripts()[1].PHP_EOL.'</head>', $output);
+    	}
+    }
 }
-
 ?>
