@@ -137,8 +137,9 @@ class SyntaxHighlighter {
     	/*	If the page is not excluded	*/
     	if ($this->synhigh_test_exclude() == false) {
     		/*	Modifying the page's end of body and head	*/
-    		$output = str_replace('</body>', PHP_EOL.$this->build_scripts()[0].PHP_EOL.'</body>', $output);
-    		$output = str_replace('</head>', PHP_EOL.$this->build_scripts()[1].PHP_EOL.'</head>', $output);
+    		$outputtemp = $this->build_scripts();
+    		$output = str_replace('</body>', PHP_EOL.$outputtemp[0].PHP_EOL.'</body>', $output);
+    		$output = str_replace('</head>', PHP_EOL.$outputtemp[1].PHP_EOL.'</head>', $output);
     	}
     }
 }
