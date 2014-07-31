@@ -50,7 +50,16 @@ class SyntaxHighlighter {
     	the array of the current page meta 	*/
     public function file_meta(&$meta)
     {
-    	$this->rmeta = array_flip($meta);
+    	$index;
+        $clonemeta = $meta;
+        /*  Removing array from the meta array in order to do an array_flip  */
+        foreach ($clonemeta as $key => $value) {
+            if (is_array($value)) {
+                $index = $key;
+                unset($clonemeta[$index]);
+            }
+        }
+        $this->rmeta = array_flip(array_filter($clonemeta));
    	}
 
    	/*	Is the current page exluded based on user's configuration ?
