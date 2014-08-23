@@ -11,12 +11,12 @@
  * @license http://bricebou.mit-license.org/
  */
 
-class SyntaxHighlighter {
+class Pico_SyntaxHighlighter {
 
 	public function config_loaded(&$settings)
 	{	
-		/*	Get the PicoCMS theme in use */
-		$this->theme_url = $settings['base_url'] .'/'. basename(THEMES_DIR) .'/'. $settings['theme'];
+		/*	Get the SyntaxHighlighter plugin folder path */
+		$this->psh_url = $settings['base_url'] .'/'. basename(PLUGINS_DIR) .'/'.array_pop(explode(DIRECTORY_SEPARATOR, dirname(__FILE__)));
 		/*	Get the variables from the user's config.php */
 		if (isset($settings['synhigh']['theme']))
         {
@@ -40,10 +40,10 @@ class SyntaxHighlighter {
         }
         /*	Adding basic variables for SyntaxHighlighter */
         $this->synhigh_base = '
-			<link href="'.$this->theme_url.'/scripts/syntaxhighlighter/styles/shCore.css" rel="stylesheet" type="text/css" />
-			<link href="'.$this->theme_url.'/scripts/syntaxhighlighter/styles/shTheme'.$this->synhigh_theme.'.css" rel="stylesheet" type="text/css" />
-			<script src="'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shCore.js"></script>';
-		$this->synhigh_autoloaderscript = '<script src="'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shAutoloader.js"></script>';
+			<link href="'.$this->psh_url.'/syntaxhighlighter/styles/shCore.css" rel="stylesheet" type="text/css" />
+			<link href="'.$this->psh_url.'/syntaxhighlighter/styles/shTheme'.$this->synhigh_theme.'.css" rel="stylesheet" type="text/css" />
+			<script src="'.$this->psh_url.'/syntaxhighlighter/scripts/shCore.js"></script>';
+		$this->synhigh_autoloaderscript = '<script src="'.$this->psh_url.'/syntaxhighlighter/scripts/shAutoloader.js"></script>';
     }
 
     /* 	Getting and inverting (for an easier comparison later)
@@ -101,7 +101,7 @@ class SyntaxHighlighter {
     			$synhigh_autobrushscripts = '';
     			foreach ($this->synhigh_autobrush as $key => $value)
 	            {
-	            	$synhigh_autobrushscripts .= '\''.$key.'		'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shBrush'.$value.'.js\','.PHP_EOL;
+	            	$synhigh_autobrushscripts .= '\''.$key.'		'.$this->psh_url.'/syntaxhighlighter/scripts/shBrush'.$value.'.js\','.PHP_EOL;
 	            }
 	            /*	Removing extra comma and space at the end of the last brush */
 	            $this->synhigh_autobrushscripts = rtrim($synhigh_autobrushscripts, ",".PHP_EOL);
@@ -128,7 +128,7 @@ class SyntaxHighlighter {
 	        	$synhigh_brushscripts = '';
 	            foreach ($this->synhigh_brush as $key => $value)
 	            {
-	            	$synhigh_brushscripts .= '<script src="'.$this->theme_url.'/scripts/syntaxhighlighter/scripts/shBrush'.$value.'.js"></script>'.PHP_EOL;
+	            	$synhigh_brushscripts .= '<script src="'.$this->psh_url.'/syntaxhighlighter/scripts/shBrush'.$value.'.js"></script>'.PHP_EOL;
 	            }
 	            /*	A single string for the page body 	*/
 	            $this->synhigh_body = '<script>SyntaxHighlighter.all()</script>';

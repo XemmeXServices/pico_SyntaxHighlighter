@@ -11,18 +11,7 @@ The code of SyntaxHighlighter is available on GitHub : [https://github.com/alexg
 
 ## Installation
 
-### Installation of SyntaxHighlighter
-
-First, download the latest version of SyntaxHighlighter from [http://alexgorbatchev.com/SyntaxHighlighter/](http://alexgorbatchev.com/SyntaxHighlighter/).
-
-Unzip it and then upload it in the `scripts` folder of the theme you are using ; make sure to rename the unpacked SyntaxHighlighter folder to `syntaxhighlighter`.
-
-Make sure SyntaxHighlighter is installed just as it is on my server :
-![installation of syntaxhighlighter](https://github.com/bricebou/pico_SyntaxHighlighter/blob/master/syntaxhighlighter_server.png)
-
-### Installation of the Pico SyntaxHighlighter plugin
-
-Place `syntaxhighlighter.php` file into the `plugins` directory.
+Place `syntaxhighlighter` folder into the `plugins` directory.
 
 ## Usage
 
@@ -100,7 +89,20 @@ hihihi
 
 If you are loading the brushes the "normal way", you have to use the aliases defined in each brush file. For the plain text brush, two aliases are defined : text and plain, but not txt.
 
-## TODO
+#### Using a snippet with Sublime Text
 
-- add template filtering ? ==> done, extended to exclusion by title, category, or other single meta tags
-- comment the code
+Instead of typing the `pre` code each time, you can use a snippet like this one:
+
+```
+<snippet>
+	<content><![CDATA[
+<pre class="brush:${1:lang}">
+
+</pre>
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>sxh</tabTrigger> -->
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>
+```
