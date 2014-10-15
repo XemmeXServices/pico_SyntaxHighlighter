@@ -16,7 +16,8 @@ class Pico_SyntaxHighlighter {
 	public function config_loaded(&$settings)
 	{	
 		/*	Get the SyntaxHighlighter plugin folder path */
-		$this->psh_url = $settings['base_url'] .'/'. basename(PLUGINS_DIR) .'/'.array_pop(explode(DIRECTORY_SEPARATOR, dirname(__FILE__)));
+        $dir = explode(DIRECTORY_SEPARATOR, dirname(__FILE__));
+		$this->psh_url = $settings['base_url'] .'/'. basename(PLUGINS_DIR) .'/'.array_pop($dir);
 		/*	Get the variables from the user's config.php */
 		if (isset($settings['synhigh']['theme']))
         {
