@@ -41,8 +41,8 @@ class Pico_SyntaxHighlighter {
         }
         /*	Adding basic variables for SyntaxHighlighter */
         $this->synhigh_base = '
-			<link href="'.$this->psh_url.'/syntaxhighlighter/styles/shCore.css" rel="stylesheet" type="text/css" />
-			<link href="'.$this->psh_url.'/syntaxhighlighter/styles/shTheme'.$this->synhigh_theme.'.css" rel="stylesheet" type="text/css" />
+			<link href="'.$this->psh_url.'/syntaxhighlighter/styles/shCore.min.css" rel="stylesheet" type="text/css" />
+			<link href="'.$this->psh_url.'/syntaxhighlighter/styles/shTheme'.$this->synhigh_theme.'.min.css" rel="stylesheet" type="text/css" />
 			<script src="'.$this->psh_url.'/syntaxhighlighter/scripts/shCore.js"></script>';
 		$this->synhigh_autoloaderscript = '<script src="'.$this->psh_url.'/syntaxhighlighter/scripts/shAutoloader.js"></script>';
     }
